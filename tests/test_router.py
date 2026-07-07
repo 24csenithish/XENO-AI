@@ -46,6 +46,17 @@ def test_model_routing():
     print("Routed image query to:", res.role)
     assert res.role == ModelRole.VISION
 
+    # 6. Short technical error must NOT route to fast
+    res = router.route("npm ERR!")
+    print("Routed npm ERR to:", res.role)
+    assert res.role == ModelRole.CODING
+    assert res.role != ModelRole.FAST
+
+    # 7. File extension detection
+    res = router.route("Check my app.py file")
+    print("Routed file extension query to:", res.role)
+    assert res.role == ModelRole.CODING
+
 
 def test_context_aware_routing():
     router = ModelRouter()

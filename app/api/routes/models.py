@@ -8,16 +8,19 @@ router = APIRouter()
 mm = ModelManager()
 health = ModelHealth(mm.client, mm.detector)
 
+
 @router.get("/")
 async def list_models():
     """Returns configured local model roles."""
     return {"models": list(MODELS.keys()), "registry": MODELS}
+
 
 @router.get("/status")
 async def get_status():
     """Returns model health."""
     active_model = mm.get_active_model()
     return await health.get_health_status(active_model)
+
 
 @router.get("/installed")
 async def get_installed():

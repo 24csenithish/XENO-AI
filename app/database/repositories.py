@@ -115,14 +115,18 @@ class MessageRepository:
                 created_at=db_msg.created_at
             )
 
+    # FIXED: get_messages now returns most recent messages in chronological order
     def get_messages(self, conversation_id: int, limit: Optional[int] = None) -> List[Message]:
         with self._get_db() as db:
+            # Get newest messages first (so LIMIT gives the most recent)
             query = db.query(models.Message).filter(
                 models.Message.conversation_id == conversation_id
-            ).order_by(models.Message.created_at.asc())
+            ).order_by(models.Message.created_at.desc())
             if limit:
                 query = query.limit(limit)
             msgs = query.all()
+            # Reverse to chronological order (oldest first) for the LLM
+            msgs = reversed(msgs)
             return [Message(
                 id=m.id,
                 conversation_id=m.conversation_id,
